@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>FollowFolders</title>
+    <link rel="stylesheet" href="./popup.css" />
+  </head>
+  <body>
+    <header>
+      <img src="/icons/icon48.png" alt="" width="28" height="28" />
+      <h1>FollowFolders</h1>
+      <span id="version" class="muted"></span>
+    </header>
+
+    <section class="card">
+      <label class="switch-row">
+        <span>
+          <strong>Activer les dossiers</strong>
+          <small class="muted">Désactivé = liste Twitch d'origine</small>
+        </span>
+        <input type="checkbox" id="enabled" role="switch" />
+      </label>
+      <label class="switch-row">
+        <span>
+          <strong>Charger toutes les chaînes</strong>
+          <small class="muted">Clique tout seul sur « Show More »</small>
+        </span>
+        <input type="checkbox" id="autoLoadAll" role="switch" />
+      </label>
+      <label class="switch-row">
+        <span>
+          <strong>Hors ligne dans les dossiers</strong>
+          <small class="muted">Afficher les chaînes hors ligne, grisées</small>
+        </span>
+        <input type="checkbox" id="showOfflineInFolders" role="switch" />
+      </label>
+    </section>
+
+    <section class="card">
+      <p id="stats" class="muted"></p>
+      <div class="row">
+        <button id="collapse-all" type="button">📁 Tout fermer</button>
+        <button id="expand-all" type="button">📂 Tout ouvrir</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <strong>Sauvegarde</strong>
+      <small class="muted">Les dossiers sont enregistrés uniquement sur ce navigateur.</small>
+      <div class="row">
+        <button id="export" type="button">⬇️ Exporter</button>
+        <button id="import" type="button">⬆️ Importer</button>
+        <input type="file" id="import-file" accept="application/json,.json" hidden />
+      </div>
+      <p id="message" role="status"></p>
+    </section>
+
+    <script type="module" src="./popup.ts"></script>
+  </body>
+</html>
