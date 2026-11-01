@@ -1,0 +1,223 @@
+<!doctype html>
+<!--
+  Imitation de la barre latérale Twitch (structure relevée le 01/11/2026).
+  Sert aux tests automatiques et à développer sans dépendre de twitch.tv.
+  Les classes « Layout-sc-… » sont volontairement fausses : l'extension ne doit pas en dépendre.
+-->
+<html lang="en-US" class="tw-root--theme-dark">
+  <head>
+    <meta charset="utf-8" />
+    <title>Twitch (fixture)</title>
+    <style>
+      :root {
+        --color-text-base: #efeff1;
+        --color-text-alt-2: #adadb8;
+        --color-fill-live: #eb0400;
+        --color-background-interactable-hover: rgba(83, 83, 95, 0.48);
+        --color-background-base: #18181b;
+        --color-background-alt: #26262c;
+        --color-text-link: #bf94ff;
+        --color-border-base: rgba(83, 83, 95, 0.48);
+        --font-base: Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      }
+      body {
+        margin: 0;
+        background: #0e0e10;
+        color: var(--color-text-base);
+        font-family: var(--font-base);
+        display: flex;
+      }
+      .side-nav {
+        width: 240px;
+        min-height: 100vh;
+        background: var(--color-background-base);
+      }
+      .side-nav-section {
+        padding-bottom: 8px;
+      }
+      .followed-side-nav-header,
+      .section-header {
+        padding: 10px 10px 4px;
+      }
+      h3 {
+        font-size: 14px;
+        margin: 0;
+      }
+      .side-nav-card__link {
+        display: flex;
+        gap: 10px;
+        padding: 5px 10px;
+        color: inherit;
+        text-decoration: none;
+        font-size: 14px;
+      }
+      .side-nav-card__link--offline {
+        opacity: 0.6;
+      }
+      img.tw-image-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+      }
+      p {
+        margin: 0;
+      }
+      .tw-channel-status-indicator {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--color-fill-live);
+        display: inline-block;
+      }
+      [data-a-target='side-nav-live-status'] {
+        margin-left: auto;
+        display: flex;
+        gap: 4px;
+        align-items: center;
+      }
+      .sr {
+        display: none;
+      }
+      main {
+        padding: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      class="Layout-sc-x side-nav side-nav--expanded"
+      data-test-selector="side-nav"
+      data-a-target="side-nav-bar"
+      role="complementary"
+    >
+      <div class="Layout-sc-x side-nav-section" role="group" aria-label="Followed Channels">
+        <div class="Layout-sc-x followed-side-nav-header followed-side-nav-header--expanded">
+          <button aria-expanded="false">
+            <div data-a-target="side-nav-header-expanded">
+              <h3>Followed Channels</h3>
+              <p>Viewers (High to Low)</p>
+            </div>
+          </button>
+        </div>
+        <div class="InjectLayout-sc-x tw-transition-group" id="followed-list"></div>
+        <div class="Layout-sc-x side-nav-show-more-toggle__button" id="toggle"></div>
+      </div>
+
+      <div class="Layout-sc-x side-nav-section" role="group" aria-label="Live Channels">
+        <div class="section-header"><h3>Live Channels</h3></div>
+        <div class="tw-transition-group">
+          <div class="side-nav-card">
+            <a
+              class="side-nav-card__link tw-link"
+              data-test-selector="recommended-channel"
+              href="/squeezie"
+            >
+              <img
+                class="tw-image-avatar"
+                alt=""
+                src="https://static-cdn.jtvnw.net/fixture/squeezie.png"
+              />
+              <div>
+                <p data-a-target="side-nav-title">Squeezie</p>
+                <p>VALORANT</p>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="Layout-sc-x side-nav-section" role="group" aria-label="Recommended Categories">
+        <div class="section-header"><h3>Recommended Categories</h3></div>
+      </div>
+    </div>
+    <main><h1 id="page">Page d'accueil</h1></main>
+
+    <script>
+      // [login, nom affiché, jeu, spectateurs] — null = hors ligne
+      const CHANNELS = [
+        ['melhssn_', 'melhssn_', 'VALORANT', '50.7K'],
+        ['gotaga', 'Gotaga', 'Teamfight Tactics', '11.8K'],
+        ['payo', 'Payo', 'World of Warcraft', '6.1K'],
+        ['nisqyy', 'Nisqyy', 'Just Chatting', '5.6K'],
+        ['savix', 'Savix', 'World of Warcraft', '4.6K'],
+        ['otplol_', 'otplol_', 'League of Legends', '2.6K'],
+        ['splinter', 'Splinter', 'League of Legends', '2.2K'],
+        ['loupiote3', 'Loupiote3', 'VALORANT', '2.1K'],
+        ['marex', 'Marex', 'Darkest Dungeon', '2.1K'],
+        ['carljrtm', 'CarlJrtm', 'Trackmania', '1.1K'],
+        ['aloonea', 'Aloonea', 'Just Chatting', '486'],
+        ['haraw', 'Haraw', 'Z1: Battle Royale', '218'],
+        ['aminethugo', 'aminethugo', 'Final Fantasy', '7'],
+        ['lastbaroudeur', 'lastbaroudeur', 'Dofus', '5'],
+        ...Array.from({ length: 18 }, (_, i) => [`offline${i + 1}`, `Offline${i + 1}`, null, null]),
+        ['katarsisgg', 'katarsisgg', null, null],
+      ];
+      let shown = 12;
+
+      function card([login, name, game, viewers], i) {
+        const offline = viewers === null;
+        const avatar = `https://static-cdn.jtvnw.net/fixture/${login}.png`;
+        return `
+          <div class="tw-transition" aria-hidden="false"><div><div class="side-nav-card">
+            <a data-a-id="followed-channel-${i}" data-test-selector="followed-channel" aria-haspopup="dialog"
+               class="ScCoreLink-x side-nav-card__link${offline ? ' side-nav-card__link--empty-category side-nav-card__link--offline' : ''} tw-link"
+               href="/${login}">
+              <div class="side-nav-card__avatar"><div class="tw-avatar"><img class="tw-image-avatar" alt="" src="${avatar}"></div></div>
+              <div><div><div data-a-target="side-nav-card-metadata">
+                <div class="side-nav-card__title"><p title="${name}" data-a-target="side-nav-title">${name}</p></div>
+                ${offline ? `<div class="side-nav-card__metadata"></div>` : `<div class="side-nav-card__metadata"><p dir="auto" title="${game}">${game}</p></div>`}
+              </div></div></div>
+              <div class="side-nav-card__live-status" data-a-target="side-nav-live-status">
+                ${
+                  offline
+                    ? `<span>Offline</span>`
+                    : `<div><div class="tw-channel-status-indicator"></div><p class="sr">Live</p></div><div><span><p>${viewers}</p></span></div><p class="sr">${viewers} viewers</p>`
+                }
+              </div>
+            </a>
+          </div></div></div>`;
+      }
+
+      function renderList() {
+        document.getElementById('followed-list').innerHTML = CHANNELS.slice(0, shown)
+          .map(card)
+          .join('');
+        const more = shown < CHANNELS.length;
+        document.getElementById('toggle').innerHTML = more
+          ? `<button data-a-target="side-nav-show-more-button" data-test-selector="ShowMore" class="tw-link">Show More</button>`
+          : `<button data-a-target="side-nav-show-less-button" data-test-selector="ShowLess" class="tw-link">Show Less</button>`;
+      }
+
+      document.getElementById('toggle').addEventListener('click', (e) => {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        shown = btn.dataset.aTarget === 'side-nav-show-more-button' ? shown + 10 : 12;
+        setTimeout(renderList, 50); // Twitch charge de façon asynchrone
+      });
+
+      // Imitation du routeur de Twitch : un clic sur une chaîne change la page sans recharger.
+      document.addEventListener('click', (e) => {
+        const a = e.target.closest('a[data-test-selector]');
+        if (!a) return;
+        e.preventDefault();
+        history.pushState({}, '', a.getAttribute('href'));
+        document.getElementById('page').textContent = 'Chaîne ' + a.getAttribute('href').slice(1);
+      });
+
+      // API de test : simuler une mise à jour de Twitch (nouveaux spectateurs, chaîne qui passe en live…)
+      window.__fixture = {
+        setViewers(login, viewers) {
+          const c = CHANNELS.find((x) => x[0] === login);
+          c[3] = viewers;
+          if (viewers && !c[2]) c[2] = 'Just Chatting';
+          renderList();
+        },
+        collapseSideNav() {
+          document.querySelector('.side-nav').classList.remove('side-nav--expanded');
+        },
+      };
+
+      renderList();
+    </script>
+  </body>
+</html>
