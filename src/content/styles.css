@@ -1,0 +1,406 @@
+/* FollowFolders — styles injectés dans twitch.tv.
+   Tout est préfixé « ff- » et utilise les variables de couleur de Twitch (thème sombre ET clair). */
+
+[data-ff-hidden] {
+  display: none !important;
+}
+
+.ff-root {
+  --ff-text: var(--color-text-base, #efeff1);
+  --ff-text-alt: var(--color-text-alt-2, #adadb8);
+  --ff-hover: var(--color-background-interactable-hover, rgba(83, 83, 95, 0.48));
+  --ff-live: var(--color-fill-live, #eb0400);
+  --ff-accent: var(--color-text-link, #bf94ff);
+  --ff-border: var(--color-border-base, rgba(83, 83, 95, 0.48));
+  --ff-menu-bg: var(--color-background-alt, #26262c);
+  font-family: var(--font-base, Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif);
+  color: var(--ff-text);
+  font-size: 14px;
+  padding-bottom: 8px;
+}
+
+.ff-root * {
+  box-sizing: border-box;
+}
+
+.ff-root button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+/* ───── En-tête de la section ───── */
+
+.ff-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 10px 4px;
+}
+
+.ff-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.ff-header-actions {
+  display: flex;
+  gap: 2px;
+}
+
+.ff-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--ff-text);
+}
+
+.ff-icon-btn:hover,
+.ff-icon-btn:focus-visible {
+  background: var(--ff-hover);
+  outline: none;
+}
+
+.ff-hint {
+  padding: 4px 10px 8px;
+  color: var(--ff-text-alt);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+/* ───── Dossier ───── */
+
+.ff-folder {
+  position: relative;
+  border-radius: 6px;
+  margin: 0 4px;
+}
+
+.ff-folder.ff-drop-target {
+  background: var(--ff-hover);
+  box-shadow: inset 0 0 0 2px var(--ff-accent);
+}
+
+.ff-folder.ff-drop-before::before,
+.ff-folder.ff-drop-after::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  height: 2px;
+  background: var(--ff-accent);
+  border-radius: 2px;
+}
+
+.ff-folder.ff-drop-before::before {
+  top: -1px;
+}
+
+.ff-folder.ff-drop-after::after {
+  bottom: -1px;
+}
+
+.ff-folder-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 32px;
+  padding: 4px 4px 4px 6px;
+  border-radius: 6px;
+  user-select: none;
+  cursor: pointer;
+}
+
+.ff-folder-header:hover,
+.ff-folder-header:focus-visible {
+  background: var(--ff-hover);
+  outline: none;
+}
+
+.ff-chevron {
+  display: inline-block;
+  width: 10px;
+  font-size: 10px;
+  color: var(--ff-text-alt);
+  transition: transform 0.15s ease;
+}
+
+.ff-folder:not(.ff-collapsed) > .ff-folder-header .ff-chevron {
+  transform: rotate(90deg);
+}
+
+.ff-folder-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.ff-folder-name {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ff-unsorted .ff-folder-name {
+  color: var(--ff-text-alt);
+}
+
+.ff-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--ff-text-alt);
+  white-space: nowrap;
+}
+
+.ff-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ff-live);
+}
+
+.ff-more {
+  opacity: 0;
+  width: 22px;
+  height: 22px;
+  font-size: 14px;
+}
+
+.ff-folder-header:hover .ff-more,
+.ff-more:focus-visible,
+.ff-more[aria-expanded='true'] {
+  opacity: 1;
+}
+
+.ff-rename-input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--ff-text);
+  background: var(--color-background-input, rgba(0, 0, 0, 0.3));
+  border: 2px solid var(--ff-accent);
+  border-radius: 4px;
+  padding: 2px 6px;
+  outline: none;
+}
+
+.ff-folder-body {
+  padding: 0 0 4px 6px;
+}
+
+.ff-collapsed > .ff-folder-body {
+  display: none;
+}
+
+.ff-empty {
+  padding: 6px 10px 8px 26px;
+  font-size: 13px;
+  color: var(--ff-text-alt);
+  font-style: italic;
+}
+
+.ff-toggle-offline {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 4px 10px 6px 26px;
+  font-size: 13px !important;
+  color: var(--ff-accent) !important;
+}
+
+.ff-toggle-offline:hover {
+  text-decoration: underline;
+}
+
+/* ───── Chaîne (copie du style des cartes Twitch) ───── */
+
+.ff-card-wrap {
+  position: relative;
+}
+
+.ff-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 8px 5px 8px;
+  border-radius: 4px;
+  color: var(--ff-text) !important;
+  text-decoration: none !important;
+}
+
+.ff-card:hover,
+.ff-card:focus-visible {
+  background: var(--ff-hover);
+  outline: none;
+}
+
+.ff-card-wrap.ff-dragging {
+  opacity: 0.4;
+}
+
+.ff-avatar {
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--ff-hover);
+}
+
+.ff-avatar-placeholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--ff-text-alt);
+}
+
+.ff-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.ff-name,
+.ff-game {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ff-name {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.ff-game {
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--ff-text-alt);
+}
+
+.ff-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  white-space: nowrap;
+  align-self: flex-start;
+  padding-top: 2px;
+}
+
+.ff-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ff-live);
+}
+
+.ff-offline .ff-avatar,
+.ff-offline .ff-meta {
+  opacity: 0.45;
+  filter: grayscale(1);
+}
+
+.ff-card-more {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+  opacity: 0;
+  background: var(--ff-menu-bg) !important;
+}
+
+.ff-card-wrap:hover .ff-card-more,
+.ff-card-more:focus-visible,
+.ff-card-more[aria-expanded='true'] {
+  opacity: 1;
+}
+
+/* ───── Menus ───── */
+
+.ff-menu {
+  position: relative;
+  z-index: 10;
+  margin: 2px 6px 6px 22px;
+  padding: 4px;
+  background: var(--ff-menu-bg);
+  border: 1px solid var(--ff-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.ff-menu-label {
+  padding: 4px 8px;
+  font-size: 12px;
+  color: var(--ff-text-alt);
+}
+
+.ff-menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 13px !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ff-menu-item:hover:not(:disabled),
+.ff-menu-item:focus-visible {
+  background: var(--ff-hover);
+  outline: none;
+}
+
+.ff-menu-item:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.ff-menu-item.ff-danger {
+  color: #ff8280 !important;
+}
+
+.ff-confirm {
+  padding: 6px 8px;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.ff-confirm-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.ff-confirm-actions button {
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-weight: 600;
+  background: var(--ff-hover) !important;
+}
+
+.ff-confirm-actions .ff-danger {
+  background: #c4241f !important;
+  color: #fff !important;
+}
