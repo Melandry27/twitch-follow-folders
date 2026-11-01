@@ -1,0 +1,43 @@
+name: Release
+
+# Pousser un tag « vX.Y.Z » crée une GitHub Release avec le .zip de l'extension.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Le tag correspond à la version de package.json
+        run: npm run release:check -- "$GITHUB_REF_NAME"
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+      - run: npm run zip
+      - name: Notes de version depuis CHANGELOG.md
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          awk -v v="$version" '
+            $0 ~ "^## \\[" v "\\]" {on=1; next}
+            on && /^## \[/ {exit}
+            on {print}
+          ' CHANGELOG.md > release-notes.md
+          [ -s release-notes.md ] || echo "Version $version" > release-notes.md
+          cat release-notes.md
+      - name: Créer la GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" release/*.zip \
+            --title "FollowFolders $GITHUB_REF_NAME" \
+            --notes-file release-notes.md
